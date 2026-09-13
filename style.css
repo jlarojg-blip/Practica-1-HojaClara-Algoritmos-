@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+
+    img {
+        max-width: 20px;
+        height: auto;
+    }
+}
+
+h1 {
+    text-align: center;
+}
+
+#hoja {
+    margin-top: 20px;
+}
