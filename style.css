@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: verdana, sans-serif;
     margin: 20px;
 
     img {
@@ -12,6 +12,26 @@ h1 {
     text-align: center;
 }
 
+table {
+    margin: auto;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #999;
+    min-width: 80px;
+    height: 30px;
+    text-align: center;
+}
+
+th {
+    background-color: #ddd;
+
+}
+
+td {
+    background-color: white;
+}
 #hoja {
     margin-top: 20px;
 }
