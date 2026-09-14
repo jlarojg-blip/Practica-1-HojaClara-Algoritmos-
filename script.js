@@ -129,11 +129,12 @@ campo.addEventListener("blur", function () {
 }
 
 
-// TOKENIZADOR
+
 function tokenizar(expresion) {
 
     const tokens = [];
     let numero = "";
+    let referencia = "";
 
     for (let i = 0; i < expresion.length; i++) {
 
@@ -144,13 +145,34 @@ function tokenizar(expresion) {
             caracter === "."
         ) {
 
-            numero += caracter;
+            if (referencia !== "") {
+                referencia += caracter;
+            } else {
+                numero += caracter;
+            }
+
+        } else if (
+            caracter >= "A" &&
+            caracter <= "Z"
+        ) {
+
+            if (numero !== "") {
+                tokens.push(Number(numero));
+                numero = "";
+            }
+
+            referencia += caracter;
 
         } else {
 
             if (numero !== "") {
                 tokens.push(Number(numero));
                 numero = "";
+            }
+
+            if (referencia !== "") {
+                tokens.push(referencia);
+                referencia = "";
             }
 
             tokens.push(caracter);
@@ -161,8 +183,14 @@ function tokenizar(expresion) {
         tokens.push(Number(numero));
     }
 
+    if (referencia !== "") {
+        tokens.push(referencia);
+    }
+
     return tokens;
 }
+
+console.log(tokenizar("A1+B1"));
 
 function obtenerPosicion(referencia) {
 
@@ -175,7 +203,7 @@ function obtenerPosicion(referencia) {
     return [fila, columna];
 }
 
-console.log(obtenerPosicion("D5"));
+
 
 // EVALUADOR DE EXPRESIONES
 function evaluarExpresion(expresion) {
@@ -185,25 +213,38 @@ function evaluarExpresion(expresion) {
     let posicion = 0;
 
 
-    function factor() {
+function factor() {
 
-        const token = tokens[posicion];
+    const token = tokens[posicion];
 
-        if (token === "(") {
-
-            posicion++;
-
-            const resultado = sumaResta();
-
-            posicion++;
-
-            return resultado;
-        }
+    if (token === "(") {
 
         posicion++;
 
-        return token;
+        const resultado = sumaResta();
+
+        posicion++;
+
+        return resultado;
     }
+
+    // Si el token es una referencia como A1, B2, C3...
+    if (typeof token === "string" && /^[A-Z][0-9]+$/.test(token)) {
+
+        const posicionCelda = obtenerPosicion(token);
+
+        const fila = posicionCelda[0];
+        const columna = posicionCelda[1];
+
+        posicion++;
+
+        return Number(datos[fila][columna]);
+    }
+
+    posicion++;
+
+    return token;
+}
 
 
     function termino() {
