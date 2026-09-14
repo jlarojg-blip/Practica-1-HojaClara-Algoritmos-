@@ -53,6 +53,11 @@ for (let fila = 1; fila <= filas; fila++) {
 
             td.addEventListener("click", function () {
 
+
+    if (td.querySelector("input")) {
+        return;
+    }
+
     const campo = document.createElement("input");
 
     campo.value = datos[td.dataset.fila][td.dataset.columna];
@@ -66,6 +71,10 @@ for (let fila = 1; fila <= filas; fila++) {
             td.textContent = campo.value;
         }
 
+        if (event.key === "Escape") {
+    td.textContent = datos[td.dataset.fila][td.dataset.columna];
+}
+
     });
 
     campo.addEventListener("blur", function () {
@@ -76,6 +85,7 @@ for (let fila = 1; fila <= filas; fila++) {
     td.appendChild(campo);
 
     campo.focus();
+    campo.select();
 
 });
 
