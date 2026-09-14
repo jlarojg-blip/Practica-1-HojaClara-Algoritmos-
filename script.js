@@ -164,6 +164,18 @@ function tokenizar(expresion) {
     return tokens;
 }
 
+function obtenerPosicion(referencia) {
+
+    const letra = referencia[0];
+    const numeroFila = Number(referencia.slice(1));
+
+    const columna = letra.charCodeAt(0) - 65;
+    const fila = numeroFila - 1;
+
+    return [fila, columna];
+}
+
+console.log(obtenerPosicion("D5"));
 
 // EVALUADOR DE EXPRESIONES
 function evaluarExpresion(expresion) {
