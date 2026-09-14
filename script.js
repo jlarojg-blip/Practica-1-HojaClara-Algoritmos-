@@ -327,7 +327,28 @@ function guardarCelda(td, campo) {
 
         td.textContent = valor;
     }
+        recalcularTodo();
 }
 
+function recalcularTodo() {
+
+    const celdas = tabla.querySelectorAll("td");
+
+    celdas.forEach(function (td) {
+
+        const fila = td.dataset.fila;
+        const columna = td.dataset.columna;
+
+        const valor = datos[fila][columna];
+
+        if (valor && valor[0] === "=") {
+
+            const expresion = valor.slice(1);
+            const resultado = evaluarExpresion(expresion);
+
+            td.textContent = resultado;
+        }
+    });
+}
 
 hoja.appendChild(tabla);
