@@ -15,12 +15,14 @@ const tabla = document.createElement("table");
 
 const encabezado = document.createElement("tr");
 
+
 const esquina = document.createElement("th");
 
 
 esquina.textContent = "";
 
 encabezado.appendChild(esquina);
+
 
 for (let i = 0; i < columnas; i++) {
 
@@ -34,6 +36,22 @@ for (let i = 0; i < columnas; i++) {
 tabla.appendChild(encabezado);
 
 
+// CREACIÓN DE LA MATRIZ DE DATOS
+const datos = [];
+
+for (let fila = 0; fila < filas; fila++) {
+
+    const nuevaFila = [];
+
+    for (let columna = 0; columna < columnas; columna++) {
+        nuevaFila.push("");
+    }
+
+    datos.push(nuevaFila);
+}
+
+
+// CREACIÓN DE LAS CELDAS
 for (let fila = 1; fila <= filas; fila++) {
 
     const tr = document.createElement("tr");
@@ -46,48 +64,63 @@ for (let fila = 1; fila <= filas; fila++) {
     for (let columna = 0; columna < columnas; columna++) {
 
         const td = document.createElement("td");
-            td.dataset.fila = fila - 1;
-   
-            td.dataset.columna = columna;
 
+        td.dataset.fila = fila - 1;
+        td.dataset.columna = columna;
 
-            td.addEventListener("click", function () {
+        td.addEventListener("click", function () {
 
+            if (td.querySelector("input")) {
+                return;
+            }
 
-    if (td.querySelector("input")) {
-        return;
+            const campo = document.createElement("input");
+            let cancelado = false;
+
+            campo.value =
+                datos[td.dataset.fila][td.dataset.columna];
+
+            td.textContent = "";
+
+            campo.addEventListener("keydown", function (event) {
+
+                if (event.key === "Enter") {
+                    guardarCelda(td, campo);
+                }
+
+if (event.key === "Escape") {
+
+    cancelado = true;
+
+    const valorAnterior =
+        datos[td.dataset.fila][td.dataset.columna];
+
+    if (valorAnterior[0] === "=") {
+
+        const expresion = valorAnterior.slice(1);
+        td.textContent = evaluarExpresion(expresion);
+
+    } else {
+
+        td.textContent = valorAnterior;
+    }
+}
+            });
+
+campo.addEventListener("blur", function () {
+
+    if (!cancelado) {
+        guardarCelda(td, campo);
     }
 
-    const campo = document.createElement("input");
-
-    campo.value = datos[td.dataset.fila][td.dataset.columna];
-
-    td.textContent = "";
-
-    campo.addEventListener("keydown", function (event) {
-
-        if (event.key === "Enter") {
-            datos[td.dataset.fila][td.dataset.columna] = campo.value;
-            td.textContent = campo.value;
-        }
-
-        if (event.key === "Escape") {
-    td.textContent = datos[td.dataset.fila][td.dataset.columna];
-}
-
-    });
-
-    campo.addEventListener("blur", function () {
-    datos[td.dataset.fila][td.dataset.columna] = campo.value;
-    td.textContent = campo.value;
 });
 
-    td.appendChild(campo);
+            td.appendChild(campo);
 
-    campo.focus();
-    campo.select();
+            campo.focus();
+            campo.select();
 
-});
+        });
 
         tr.appendChild(td);
     }
@@ -96,18 +129,151 @@ for (let fila = 1; fila <= filas; fila++) {
 }
 
 
-const datos = [];
+// TOKENIZADOR
+function tokenizar(expresion) {
 
-for (let fila = 0; fila < filas; fila++) {
+    const tokens = [];
+    let numero = "";
 
-    const nuevaFila = [];
+    for (let i = 0; i < expresion.length; i++) {
 
-    for (let columna = 0; columna < columnas; columna++) {
+        const caracter = expresion[i];
 
-        nuevaFila.push("");
+        if (
+            (caracter >= "0" && caracter <= "9") ||
+            caracter === "."
+        ) {
+
+            numero += caracter;
+
+        } else {
+
+            if (numero !== "") {
+                tokens.push(Number(numero));
+                numero = "";
+            }
+
+            tokens.push(caracter);
+        }
     }
 
-    datos.push(nuevaFila);
+    if (numero !== "") {
+        tokens.push(Number(numero));
+    }
+
+    return tokens;
+}
+
+
+// EVALUADOR DE EXPRESIONES
+function evaluarExpresion(expresion) {
+
+    const tokens = tokenizar(expresion);
+
+    let posicion = 0;
+
+
+    function factor() {
+
+        const token = tokens[posicion];
+
+        if (token === "(") {
+
+            posicion++;
+
+            const resultado = sumaResta();
+
+            posicion++;
+
+            return resultado;
+        }
+
+        posicion++;
+
+        return token;
+    }
+
+
+    function termino() {
+
+        let resultado = factor();
+
+        while (
+            tokens[posicion] === "*" ||
+            tokens[posicion] === "/"
+        ) {
+
+            const operador = tokens[posicion];
+
+            posicion++;
+
+            const siguiente = factor();
+
+            if (operador === "*") {
+                resultado = resultado * siguiente;
+            }
+
+            if (operador === "/") {
+                resultado = resultado / siguiente;
+            }
+        }
+
+        return resultado;
+    }
+
+
+    function sumaResta() {
+
+        let resultado = termino();
+
+        while (
+            tokens[posicion] === "+" ||
+            tokens[posicion] === "-"
+        ) {
+
+            const operador = tokens[posicion];
+
+            posicion++;
+
+            const siguiente = termino();
+
+            if (operador === "+") {
+                resultado = resultado + siguiente;
+            }
+
+            if (operador === "-") {
+                resultado = resultado - siguiente;
+            }
+        }
+
+        return resultado;
+    }
+
+
+    return sumaResta();
+}
+
+
+// GUARDAR UNA CELDA
+function guardarCelda(td, campo) {
+
+    const valor = campo.value;
+
+    datos[td.dataset.fila][td.dataset.columna] = valor;
+
+    if (valor[0] === "=") {
+
+        const expresion = valor.slice(1);
+
+        const resultado =
+            evaluarExpresion(expresion);
+
+        td.textContent = resultado;
+
+    } else {
+
+        td.textContent = valor;
+    }
 }
 
 
