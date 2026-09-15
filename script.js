@@ -247,8 +247,68 @@ function sumarRango(inicio, fin) {
     return suma;
 }
 
+function promedioRango(inicio, fin) {
 
+    const valores = obtenerRango(inicio, fin);
 
+    let suma = 0;
+    let cantidad = 0;
+
+    for (let i = 0; i < valores.length; i++) {
+
+        if (valores[i] !== "") {
+            suma = suma + Number(valores[i]);
+            cantidad++;
+        }
+
+    }
+
+    return suma / cantidad;
+}
+
+function maximoRango(inicio, fin) {
+
+    const valores = obtenerRango(inicio, fin);
+
+    let maximo = null;
+
+    for (let i = 0; i < valores.length; i++) {
+
+        if (valores[i] !== "") {
+
+            const numero = Number(valores[i]);
+
+            if (maximo === null || numero > maximo) {
+                maximo = numero;
+            }
+
+        }
+    }
+
+    return maximo;
+}
+
+function minimoRango(inicio, fin) {
+
+    const valores = obtenerRango(inicio, fin);
+
+    let minimo = null;
+
+    for (let i = 0; i < valores.length; i++) {
+
+        if (valores[i] !== "") {
+
+            const numero = Number(valores[i]);
+
+            if (minimo === null || numero < minimo) {
+                minimo = numero;
+            }
+
+        }
+    }
+
+    return minimo;
+}
 
 // EVALUADOR DE EXPRESIONES
 function evaluarExpresion(expresion) {
@@ -265,6 +325,45 @@ function evaluarExpresion(expresion) {
 
         return sumarRango(inicio, fin);
     }
+
+    if (
+    expresion.startsWith("PROMEDIO(") &&
+    expresion.endsWith(")")
+) {
+    const contenido = expresion.slice(9, -1);
+    const partes = contenido.split(":");
+
+    const inicio = partes[0];
+    const fin = partes[1];
+
+    return promedioRango(inicio, fin);
+}
+
+if (
+    expresion.startsWith("MAX(") &&
+    expresion.endsWith(")")
+) {
+    const contenido = expresion.slice(4, -1);
+    const partes = contenido.split(":");
+
+    const inicio = partes[0];
+    const fin = partes[1];
+
+    return maximoRango(inicio, fin);
+}
+
+if (
+    expresion.startsWith("MIN(") &&
+    expresion.endsWith(")")
+) {
+    const contenido = expresion.slice(4, -1);
+    const partes = contenido.split(":");
+
+    const inicio = partes[0];
+    const fin = partes[1];
+
+    return minimoRango(inicio, fin);
+}
 
     const tokens = tokenizar(expresion);
 
