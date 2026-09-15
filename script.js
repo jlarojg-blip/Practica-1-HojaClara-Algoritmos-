@@ -373,6 +373,15 @@ if (
 
 function obtenerValorCelda(fila, columna) {
 
+    if (
+    fila < 0 ||
+    fila >= filas ||
+    columna < 0 ||
+    columna >= columnas
+) {
+    return "#REF!";
+}
+
     const valor = datos[fila][columna];
 
     if (valor === "") {
@@ -438,45 +447,51 @@ function factor() {
 
             const siguiente = factor();
 
-            if (operador === "*") {
-                resultado = resultado * siguiente;
-            }
+if (operador === "/") {
 
-            if (operador === "/") {
-                resultado = resultado / siguiente;
-            }
+    if (siguiente === 0) {
+        return "#DIV/0!";
+    }
+
+    resultado = resultado / siguiente;
+}
         }
 
         return resultado;
     }
 
 
-    function sumaResta() {
+function sumaResta() {
+    let resultado = termino();
 
-        let resultado = termino();
-
-        while (
-            tokens[posicion] === "+" ||
-            tokens[posicion] === "-"
-        ) {
-
-            const operador = tokens[posicion];
-
-            posicion++;
-
-            const siguiente = termino();
-
-            if (operador === "+") {
-                resultado = resultado + siguiente;
-            }
-
-            if (operador === "-") {
-                resultado = resultado - siguiente;
-            }
-        }
-
+    if (typeof resultado === "string" && resultado[0] === "#") {
         return resultado;
     }
+
+    while (
+        tokens[posicion] === "+" ||
+        tokens[posicion] === "-"
+    ) {
+        const operador = tokens[posicion];
+        posicion++;
+
+        const siguiente = termino();
+
+        if (typeof siguiente === "string" && siguiente[0] === "#") {
+            return siguiente;
+        }
+
+        if (operador === "+") {
+            resultado = resultado + siguiente;
+        }
+
+        if (operador === "-") {
+            resultado = resultado - siguiente;
+        }
+    }
+
+    return resultado;
+}
 
 
     return sumaResta();
