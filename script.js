@@ -664,6 +664,43 @@ function cargarHoja() {
     }
 }
 
+function exportarCSV() {
+
+    let contenido = "";
+
+    for (let fila = 0; fila < filas; fila++) {
+
+        for (let columna = 0; columna < columnas; columna++) {
+
+            contenido += datos[fila][columna];
+
+            if (columna < columnas - 1) {
+                contenido += ";";
+            }
+        }
+
+        contenido += "\n";
+    }
+
+    const archivo = new Blob(
+    [contenido],
+    { type: "text/csv" }
+);
+
+const enlace = document.createElement("a");
+
+enlace.href = URL.createObjectURL(archivo);
+enlace.download = "HojaClara.csv";
+
+enlace.click();
+
+
+}
+
+document
+    .getElementById("exportarCSV")
+    .addEventListener("click", exportarCSV);
+
 cargarHoja();
 
 hoja.appendChild(tabla);
