@@ -265,6 +265,10 @@ localStorage.removeItem("hojaClara");
         recalcularTodo();
     });
 
+    document
+    .getElementById("guardarHoja")
+    .addEventListener("click", guardarHoja);
+    
 
 document
     .getElementById("exportarCSV")
