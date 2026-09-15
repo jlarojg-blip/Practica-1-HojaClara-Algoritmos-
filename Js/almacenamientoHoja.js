@@ -1,5 +1,7 @@
 function guardarHoja() {
     localStorage.setItem("hojaClara", JSON.stringify(datos));
+    const estado = document.getElementById("estadoGuardado");
+    estado.textContent = "✓ Guardado";
 }
 
 function cargarHoja() {
