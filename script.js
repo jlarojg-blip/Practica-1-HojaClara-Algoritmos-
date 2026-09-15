@@ -190,7 +190,7 @@ function tokenizar(expresion) {
     return tokens;
 }
 
-console.log(tokenizar("A1+B1"));
+
 
 function obtenerPosicion(referencia) {
 
@@ -203,14 +203,74 @@ function obtenerPosicion(referencia) {
     return [fila, columna];
 }
 
+function obtenerRango(inicio, fin) {
+
+    const posicionInicio = obtenerPosicion(inicio);
+    const posicionFin = obtenerPosicion(fin);
+
+    const valores = [];
+
+    for (
+        let fila = posicionInicio[0];
+        fila <= posicionFin[0];
+        fila++
+    ) {
+
+        for (
+            let columna = posicionInicio[1];
+            columna <= posicionFin[1];
+            columna++
+        ) {
+
+            valores.push(datos[fila][columna]);
+
+        }
+    }
+
+    return valores;
+}
+
+function sumarRango(inicio, fin) {
+
+    const valores = obtenerRango(inicio, fin);
+
+    let suma = 0;
+
+    for (let i = 0; i < valores.length; i++) {
+
+        if (valores[i] !== "") {
+            suma = suma + Number(valores[i]);
+        }
+
+    }
+
+    return suma;
+}
+
+
 
 
 // EVALUADOR DE EXPRESIONES
 function evaluarExpresion(expresion) {
 
+     if (
+        expresion.startsWith("SUMA(") &&
+        expresion.endsWith(")")
+    ) {
+        const contenido = expresion.slice(5, -1);
+        const partes = contenido.split(":");
+
+        const inicio = partes[0];
+        const fin = partes[1];
+
+        return sumarRango(inicio, fin);
+    }
+
     const tokens = tokenizar(expresion);
 
     let posicion = 0;
+
+
 
 function obtenerValorCelda(fila, columna) {
 
@@ -321,6 +381,7 @@ function factor() {
 
 
     return sumaResta();
+
 }
 
 
