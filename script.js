@@ -613,6 +613,7 @@ function guardarCelda(td, campo) {
     }
 
     recalcularTodo();
+    guardarHoja();
 }
 
 function recalcularTodo() {
@@ -632,8 +633,39 @@ function recalcularTodo() {
             const resultado = evaluarExpresion(expresion);
 
             td.textContent = resultado;
+
+        } else {
+
+            td.textContent = valor;
         }
     });
 }
 
+function guardarHoja() {
+    localStorage.setItem("hojaClara", JSON.stringify(datos));
+}
+
+function cargarHoja() {
+
+    const datosGuardados = localStorage.getItem("hojaClara");
+
+    if (datosGuardados !== null) {
+
+        const datosCargados = JSON.parse(datosGuardados);
+
+        for (let fila = 0; fila < filas; fila++) {
+
+            for (let columna = 0; columna < columnas; columna++) {
+
+                datos[fila][columna] =
+                    datosCargados[fila][columna];
+            }
+        }
+    }
+}
+
+cargarHoja();
+
 hoja.appendChild(tabla);
+
+recalcularTodo();
