@@ -35,7 +35,7 @@ for (let i = 0; i < columnas; i++) {
 
 tabla.appendChild(encabezado);
 
-
+const celdasCalculando = [];
 // CREACIÓN DE LA MATRIZ DE DATOS
 const datos = [];
 
@@ -431,25 +431,37 @@ if (parentesis !== 0) {
 function obtenerValorCelda(fila, columna) {
 
     if (
-    fila < 0 ||
-    fila >= filas ||
-    columna < 0 ||
-    columna >= columnas
-) {
-    return "#REF!";
-}
+        fila < 0 ||
+        fila >= filas ||
+        columna < 0 ||
+        columna >= columnas
+    ) {
+        return "#REF!";
+    }
+
+    const nombreCelda =
+        String.fromCharCode(65 + columna) + (fila + 1);
+
+    if (celdasCalculando.includes(nombreCelda)) {
+        return "#CIRC!";
+    }
 
     const valor = datos[fila][columna];
 
-    if (valor === "") {
-        return 0;
-    }
+if (valor === "") {
+    return "#REF!";
+}
 
     if (valor[0] === "=") {
 
-        const expresion = valor.slice(1);
+        celdasCalculando.push(nombreCelda);
 
-        return evaluarExpresion(expresion);
+        const expresion = valor.slice(1);
+        const resultado = evaluarExpresion(expresion);
+
+        celdasCalculando.pop();
+
+        return resultado;
     }
 
     return Number(valor);
@@ -492,6 +504,13 @@ function termino() {
 
     let resultado = factor();
 
+    if (
+        typeof resultado === "string" &&
+        resultado[0] === "#"
+    ) {
+        return resultado;
+    }
+
     while (
         tokens[posicion] === "*" ||
         tokens[posicion] === "/"
@@ -500,6 +519,13 @@ function termino() {
         posicion++;
 
         const siguiente = factor();
+
+        if (
+            typeof siguiente === "string" &&
+            siguiente[0] === "#"
+        ) {
+            return siguiente;
+        }
 
         if (operador === "*") {
             resultado = resultado * siguiente;
@@ -566,10 +592,18 @@ function guardarCelda(td, campo) {
 
     if (valor[0] === "=") {
 
-        const expresion = valor.slice(1);
+        const nombreCelda =
+            String.fromCharCode(
+                65 + Number(td.dataset.columna)
+            ) +
+            (Number(td.dataset.fila) + 1);
 
-        const resultado =
-            evaluarExpresion(expresion);
+        celdasCalculando.push(nombreCelda);
+
+        const expresion = valor.slice(1);
+        const resultado = evaluarExpresion(expresion);
+
+        celdasCalculando.pop();
 
         td.textContent = resultado;
 
@@ -577,7 +611,8 @@ function guardarCelda(td, campo) {
 
         td.textContent = valor;
     }
-        recalcularTodo();
+
+    recalcularTodo();
 }
 
 function recalcularTodo() {
