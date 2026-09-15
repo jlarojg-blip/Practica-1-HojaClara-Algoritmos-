@@ -212,6 +212,23 @@ function evaluarExpresion(expresion) {
 
     let posicion = 0;
 
+function obtenerValorCelda(fila, columna) {
+
+    const valor = datos[fila][columna];
+
+    if (valor === "") {
+        return 0;
+    }
+
+    if (valor[0] === "=") {
+
+        const expresion = valor.slice(1);
+
+        return evaluarExpresion(expresion);
+    }
+
+    return Number(valor);
+}
 
 function factor() {
 
@@ -238,7 +255,7 @@ function factor() {
 
         posicion++;
 
-        return Number(datos[fila][columna]);
+        return obtenerValorCelda(fila, columna);
     }
 
     posicion++;
