@@ -369,6 +369,63 @@ if (
 
     let posicion = 0;
 
+    if (
+    tokens.length === 0 ||
+    tokens[0] === "+" ||
+    tokens[0] === "-" ||
+    tokens[0] === "*" ||
+    tokens[0] === "/" ||
+    tokens[tokens.length - 1] === "+" ||
+    tokens[tokens.length - 1] === "-" ||
+    tokens[tokens.length - 1] === "*" ||
+    tokens[tokens.length - 1] === "/"
+) {
+    return "#ERROR!";
+}
+
+for (let i = 0; i < tokens.length - 1; i++) {
+
+    const actual = tokens[i];
+    const siguiente = tokens[i + 1];
+
+    const actualEsOperador =
+        actual === "+" ||
+        actual === "-" ||
+        actual === "*" ||
+        actual === "/";
+
+    const siguienteEsOperador =
+        siguiente === "+" ||
+        siguiente === "-" ||
+        siguiente === "*" ||
+        siguiente === "/";
+
+    if (actualEsOperador && siguienteEsOperador) {
+        return "#ERROR!";
+    }
+}
+
+let parentesis = 0;
+
+for (let i = 0; i < tokens.length; i++) {
+
+    if (tokens[i] === "(") {
+        parentesis++;
+    }
+
+    if (tokens[i] === ")") {
+        parentesis--;
+
+        if (parentesis < 0) {
+            return "#ERROR!";
+        }
+    }
+}
+
+if (parentesis !== 0) {
+    return "#ERROR!";
+}
+
 
 
 function obtenerValorCelda(fila, columna) {
@@ -431,34 +488,35 @@ function factor() {
     return token;
 }
 
+function termino() {
 
-    function termino() {
+    let resultado = factor();
 
-        let resultado = factor();
+    while (
+        tokens[posicion] === "*" ||
+        tokens[posicion] === "/"
+    ) {
+        const operador = tokens[posicion];
+        posicion++;
 
-        while (
-            tokens[posicion] === "*" ||
-            tokens[posicion] === "/"
-        ) {
+        const siguiente = factor();
 
-            const operador = tokens[posicion];
-
-            posicion++;
-
-            const siguiente = factor();
-
-if (operador === "/") {
-
-    if (siguiente === 0) {
-        return "#DIV/0!";
-    }
-
-    resultado = resultado / siguiente;
-}
+        if (operador === "*") {
+            resultado = resultado * siguiente;
         }
 
-        return resultado;
+        if (operador === "/") {
+
+            if (siguiente === 0) {
+                return "#DIV/0!";
+            }
+
+            resultado = resultado / siguiente;
+        }
     }
+
+    return resultado;
+}
 
 
 function sumaResta() {
