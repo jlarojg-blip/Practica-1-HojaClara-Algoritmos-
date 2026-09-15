@@ -631,6 +631,34 @@ function guardarCelda(td, campo) {
     guardarHoja();
 }
 
+
+function aplicarEstiloCelda(td, valor) {
+
+    td.classList.remove(
+        "positivo",
+        "negativo",
+        "error"
+    );
+
+    if (
+        typeof valor === "string" &&
+        valor[0] === "#"
+    ) {
+        td.classList.add("error");
+        return;
+    }
+
+    const numero = Number(valor);
+
+    if (valor !== "" && numero > 0) {
+        td.classList.add("positivo");
+    }
+
+    if (valor !== "" && numero < 0) {
+        td.classList.add("negativo");
+    }
+}
+
 function recalcularTodo() {
 
     const celdas = tabla.querySelectorAll("td");
@@ -648,10 +676,13 @@ function recalcularTodo() {
             const resultado = evaluarExpresion(expresion);
 
             td.textContent = resultado;
+                aplicarEstiloCelda(td, resultado);
+
 
         } else {
 
             td.textContent = valor;
+            aplicarEstiloCelda(td, valor);
         }
     });
 }

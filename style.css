@@ -35,3 +35,16 @@ td {
 #hoja {
     margin-top: 20px;
 }
+
+.positivo {
+    background-color: #d4edda;
+}
+
+.negativo {
+    background-color: #f8d7da;
+}
+
+.error {
+    background-color: #fff3cd;
+    font-weight: bold;
+}
