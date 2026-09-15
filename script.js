@@ -86,6 +86,21 @@ for (let fila = 1; fila <= filas; fila++) {
 
                 if (event.key === "Enter") {
                     guardarCelda(td, campo);
+
+                    const filaActual = Number(td.dataset.fila);
+const columnaActual = Number(td.dataset.columna);
+
+const siguienteFila = filaActual + 1;
+
+if (siguienteFila < filas) {
+
+    const siguienteCelda = tabla.querySelector(
+        `td[data-fila="${siguienteFila}"][data-columna="${columnaActual}"]`
+    );
+
+    siguienteCelda.click();
+}
+
                 }
 
 if (event.key === "Escape") {
