@@ -218,32 +218,7 @@ function obtenerPosicion(referencia) {
     return [fila, columna];
 }
 
-function obtenerRango(inicio, fin) {
 
-    const posicionInicio = obtenerPosicion(inicio);
-    const posicionFin = obtenerPosicion(fin);
-
-    const valores = [];
-
-    for (
-        let fila = posicionInicio[0];
-        fila <= posicionFin[0];
-        fila++
-    ) {
-
-        for (
-            let columna = posicionInicio[1];
-            columna <= posicionFin[1];
-            columna++
-        ) {
-
-            valores.push(datos[fila][columna]);
-
-        }
-    }
-
-    return valores;
-}
 
 function sumarRango(inicio, fin) {
 
