@@ -3,26 +3,22 @@ console.log("HojaClara PRUEBA NUEVA");
 const filas = 15;
 const columnas = 10;
 
-
-
 const hoja = document.getElementById("hoja");
-
-
 
 const tabla = document.createElement("table");
 
 
+// ========================================
+// CREACIÓN DE ENCABEZADOS
+// ========================================
 
 const encabezado = document.createElement("tr");
 
-
 const esquina = document.createElement("th");
-
 
 esquina.textContent = "";
 
 encabezado.appendChild(esquina);
-
 
 for (let i = 0; i < columnas; i++) {
 
@@ -35,8 +31,21 @@ for (let i = 0; i < columnas; i++) {
 
 tabla.appendChild(encabezado);
 
+
+// ========================================
+// VARIABLES PARA LOS CÁLCULOS
+// ========================================
+
 const celdasCalculando = [];
+
+// Guarda la celda seleccionada para la barra de fórmulas
+let celdaSeleccionada = null;
+
+
+// ========================================
 // CREACIÓN DE LA MATRIZ DE DATOS
+// ========================================
+
 const datos = [];
 
 for (let fila = 0; fila < filas; fila++) {
@@ -44,37 +53,88 @@ for (let fila = 0; fila < filas; fila++) {
     const nuevaFila = [];
 
     for (let columna = 0; columna < columnas; columna++) {
+
         nuevaFila.push("");
+
     }
 
     datos.push(nuevaFila);
 }
 
 
+// ========================================
 // CREACIÓN DE LAS CELDAS
+// ========================================
+
 for (let fila = 1; fila <= filas; fila++) {
 
     const tr = document.createElement("tr");
 
     const numeroFila = document.createElement("th");
+
     numeroFila.textContent = fila;
 
     tr.appendChild(numeroFila);
+
 
     for (let columna = 0; columna < columnas; columna++) {
 
         const td = document.createElement("td");
 
         td.dataset.fila = fila - 1;
+
         td.dataset.columna = columna;
+
+
+        // ========================================
+        // CLICK EN UNA CELDA
+        // ========================================
 
         td.addEventListener("click", function () {
 
+            // Guardamos la celda seleccionada
+            celdaSeleccionada = td;
+
+
+            // ========================================
+            // ACTUALIZAR BARRA DE FÓRMULAS
+            // ========================================
+
+            const nombreCelda =
+                document.getElementById("nombreCelda");
+
+            const barraFormula =
+                document.getElementById("barraFormula");
+
+            const letraColumna =
+                String.fromCharCode(
+                    65 + Number(td.dataset.columna)
+                );
+
+            const numeroFila =
+                Number(td.dataset.fila) + 1;
+
+            nombreCelda.textContent =
+                letraColumna + numeroFila;
+
+            barraFormula.value =
+                datos[td.dataset.fila][td.dataset.columna];
+
+
+            // Evita crear otro input si ya estamos editando
             if (td.querySelector("input")) {
+
                 return;
+
             }
 
+
+            // ========================================
+            // EDITAR DIRECTAMENTE EN LA CELDA
+            // ========================================
+
             const campo = document.createElement("input");
+
             let cancelado = false;
 
             campo.value =
@@ -82,109 +142,166 @@ for (let fila = 1; fila <= filas; fila++) {
 
             td.textContent = "";
 
+
+            // ========================================
+            // TECLAS ENTER Y ESCAPE
+            // ========================================
+
             campo.addEventListener("keydown", function (event) {
 
-if (event.key === "Enter") {
+                if (event.key === "Enter") {
 
-    event.preventDefault();
-    cancelado = true;
+                    event.preventDefault();
 
-    const filaActual = Number(td.dataset.fila);
-    const columnaActual = Number(td.dataset.columna);
+                    cancelado = true;
 
-    guardarCelda(td, campo);
+                    const filaActual =
+                        Number(td.dataset.fila);
 
-    const siguienteFila = filaActual + 1;
+                    const columnaActual =
+                        Number(td.dataset.columna);
 
-    if (siguienteFila < filas) {
+                    guardarCelda(td, campo);
 
-        const siguienteCelda = tabla.querySelector(
-            `td[data-fila="${siguienteFila}"][data-columna="${columnaActual}"]`
-        );
+                    const siguienteFila =
+                        filaActual + 1;
 
-        siguienteCelda.click();
-    }
-}
+                    if (siguienteFila < filas) {
 
-if (event.key === "Escape") {
+                        const siguienteCelda =
+                            tabla.querySelector(
+                                `td[data-fila="${siguienteFila}"][data-columna="${columnaActual}"]`
+                            );
 
-    cancelado = true;
+                        siguienteCelda.click();
 
-    const valorAnterior =
-        datos[td.dataset.fila][td.dataset.columna];
+                    }
 
-    if (valorAnterior[0] === "=") {
+                }
 
-        const expresion = valorAnterior.slice(1);
-        td.textContent = evaluarExpresion(expresion);
 
-    } else {
+                if (event.key === "Escape") {
 
-        td.textContent = valorAnterior;
-    }
-}
+                    cancelado = true;
+
+                    const valorAnterior =
+                        datos[td.dataset.fila][td.dataset.columna];
+
+                    if (valorAnterior[0] === "=") {
+
+                        const expresion =
+                            valorAnterior.slice(1);
+
+                        td.textContent =
+                            evaluarExpresion(expresion);
+
+                    } else {
+
+                        td.textContent =
+                            valorAnterior;
+
+                    }
+
+                }
+
             });
 
-campo.addEventListener("blur", function () {
 
-    if (!cancelado) {
-        guardarCelda(td, campo);
-    }
+            // ========================================
+            // GUARDAR AL SALIR DE LA CELDA
+            // ========================================
 
-});
+            campo.addEventListener("blur", function () {
+
+                if (!cancelado) {
+
+                    guardarCelda(td, campo);
+
+                }
+
+            });
+
 
             td.appendChild(campo);
 
             campo.focus();
+
             campo.select();
 
         });
 
+
         tr.appendChild(td);
+
     }
 
     tabla.appendChild(tr);
 }
 
 
-
-
-
-
+// ========================================
 // GUARDAR UNA CELDA
+// ========================================
+
 function guardarCelda(td, campo) {
 
     const valor = campo.value;
 
-    datos[td.dataset.fila][td.dataset.columna] = valor;
+    datos[td.dataset.fila][td.dataset.columna] =
+        valor;
 
-if (valor[0] === "=") {
 
-    const nombreCelda =
-        String.fromCharCode(
-            65 + Number(td.dataset.columna)
-        ) +
-        (Number(td.dataset.fila) + 1);
+    if (valor[0] === "=") {
 
-    celdasCalculando.push(nombreCelda);
+        const nombreCelda =
+            String.fromCharCode(
+                65 + Number(td.dataset.columna)
+            ) +
+            (Number(td.dataset.fila) + 1);
 
-    const expresion = valor.slice(1);
-    const resultado = evaluarExpresion(expresion);
 
-    celdasCalculando.pop();
+        celdasCalculando.push(nombreCelda);
 
-    td.textContent = resultado;
-    aplicarEstiloCelda(td, resultado);
 
-} else {
+        const expresion =
+            valor.slice(1);
 
-    td.textContent = valor;
-    aplicarEstiloCelda(td, valor);
+        const resultado =
+            evaluarExpresion(expresion);
+
+
+        celdasCalculando.pop();
+
+
+        td.textContent =
+            resultado;
+
+        aplicarEstiloCelda(
+            td,
+            resultado
+        );
+
+    } else {
+
+        td.textContent =
+            valor;
+
+        aplicarEstiloCelda(
+            td,
+            valor
+        );
+
+    }
+
+
+    recalcularTodo();
+
 }
 
-recalcularTodo();
-}
 
+// ========================================
+// ESTILOS DE LAS CELDAS
+// ========================================
 
 function aplicarEstiloCelda(td, valor) {
 
@@ -194,53 +311,109 @@ function aplicarEstiloCelda(td, valor) {
         "error"
     );
 
+
+    // Error
     if (
         typeof valor === "string" &&
         valor[0] === "#"
     ) {
+
         td.classList.add("error");
+
         return;
+
     }
 
-    const numero = Number(valor);
 
-    if (valor !== "" && numero > 0) {
+    const numero =
+        Number(valor);
+
+
+    // Número positivo
+    if (
+        valor !== "" &&
+        numero > 0
+    ) {
+
         td.classList.add("positivo");
+
     }
 
-    if (valor !== "" && numero < 0) {
+
+    // Número negativo
+    if (
+        valor !== "" &&
+        numero < 0
+    ) {
+
         td.classList.add("negativo");
+
     }
+
 }
+
+
+// ========================================
+// RECALCULAR TODAS LAS FÓRMULAS
+// ========================================
 
 function recalcularTodo() {
 
-    const celdas = tabla.querySelectorAll("td");
+    const celdas =
+        tabla.querySelectorAll("td");
+
 
     celdas.forEach(function (td) {
 
-        const fila = td.dataset.fila;
-        const columna = td.dataset.columna;
+        const fila =
+            td.dataset.fila;
 
-        const valor = datos[fila][columna];
+        const columna =
+            td.dataset.columna;
 
-        if (valor && valor[0] === "=") {
+        const valor =
+            datos[fila][columna];
 
-            const expresion = valor.slice(1);
-            const resultado = evaluarExpresion(expresion);
 
-            td.textContent = resultado;
-                aplicarEstiloCelda(td, resultado);
+        if (
+            valor &&
+            valor[0] === "="
+        ) {
 
+            const expresion =
+                valor.slice(1);
+
+            const resultado =
+                evaluarExpresion(expresion);
+
+            td.textContent =
+                resultado;
+
+            aplicarEstiloCelda(
+                td,
+                resultado
+            );
 
         } else {
 
-            td.textContent = valor;
-            aplicarEstiloCelda(td, valor);
+            td.textContent =
+                valor;
+
+            aplicarEstiloCelda(
+                td,
+                valor
+            );
+
         }
+
     });
+
 }
 
+
+// ========================================
+// LIMPIAR HOJA
+// ========================================
 
 document
     .getElementById("limpiarHoja")
@@ -250,29 +423,115 @@ document
             "¿Seguro que deseas borrar toda la hoja?"
         );
 
+
         if (!confirmar) {
+
             return;
+
         }
+
 
         for (let fila = 0; fila < filas; fila++) {
 
-            for (let columna = 0; columna < columnas; columna++) {
+            for (
+                let columna = 0;
+                columna < columnas;
+                columna++
+            ) {
+
                 datos[fila][columna] = "";
+
             }
 
         }
-localStorage.removeItem("hojaClara");
+
+
+        // Elimina también los datos guardados
+        localStorage.removeItem("hojaClara");
+
+
         recalcularTodo();
+
+
+        // Limpiamos también la barra de fórmulas
+        document.getElementById("nombreCelda").textContent =
+            "A1";
+
+        document.getElementById("barraFormula").value =
+            "";
+
+        celdaSeleccionada = null;
+
     });
 
-    document
+
+// ========================================
+// BOTÓN GUARDAR
+// ========================================
+
+document
     .getElementById("guardarHoja")
-    .addEventListener("click", guardarHoja);
-    
+    .addEventListener(
+        "click",
+        guardarHoja
+    );
+
+
+// ========================================
+// BOTÓN EXPORTAR CSV
+// ========================================
 
 document
     .getElementById("exportarCSV")
-    .addEventListener("click", exportarCSV);
+    .addEventListener(
+        "click",
+        exportarCSV
+    );
+
+
+// ========================================
+// BARRA DE FÓRMULAS
+// ========================================
+
+const barraFormula =
+    document.getElementById("barraFormula");
+
+
+barraFormula.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Enter" &&
+            celdaSeleccionada !== null
+        ) {
+
+            event.preventDefault();
+
+            const fila =
+                celdaSeleccionada.dataset.fila;
+
+            const columna =
+                celdaSeleccionada.dataset.columna;
+
+
+            // Guardamos lo escrito en la matriz
+            datos[fila][columna] =
+                barraFormula.value;
+
+
+            // Recalculamos la hoja
+            recalcularTodo();
+
+        }
+
+    }
+);
+
+
+// ========================================
+// INICIAR HOJACLARA
+// ========================================
 
 cargarHoja();
 

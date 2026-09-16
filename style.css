@@ -183,3 +183,35 @@ td:hover {
     background-color: #198754;
     border-radius: 50%;
 }
+.barra-formulas {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.nombre-celda {
+    width: 65px;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-right: 1px solid #d0d5dd;
+}
+
+.simbolo-fx {
+    padding: 10px 14px;
+    font-weight: bold;
+    font-style: italic;
+    color: #198754;
+}
+
+#barraFormula {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
