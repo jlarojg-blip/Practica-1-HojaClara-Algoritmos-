@@ -293,8 +293,10 @@ function guardarCelda(td, campo) {
 
     }
 
-
+    
     recalcularTodo();
+        guardarHoja();
+
 
 }
 
